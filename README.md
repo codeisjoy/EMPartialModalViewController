@@ -8,7 +8,9 @@ EMPartialModalViewController is a UIViewController subclass which takes a root v
 
 ## Usage
 
-It is pretty simple to use. Just initialise an instance of `EMPartialModalViewController` with a root view controller which would be the content of your modal.
+Before using the view controller to show your modals it is necessary to set `View controller-based status bar appearance` in the `Info.plist` of application `NO`. It is needed to capture the status bar in screen snapshot when modal view controller is about to show.
+
+Then just initialise an instance of `EMPartialModalViewController` with a root view controller which would be the content of your modal.
 
 There is two way to initialise:
 
