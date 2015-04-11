@@ -38,7 +38,7 @@ class EMPartialModalViewController: UIViewController {
     private var snapshotView: UIView = UIScreen.mainScreen().snapshotViewAfterScreenUpdates(false)
 
     // An overlay view, as button to dismiss the modal view controller on being touched
-    private let overlayView: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as UIButton
+    private let overlayView: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
 
     // A view controller holds the main content of modal
     private var contentViewController: UIViewController?
@@ -96,11 +96,6 @@ class EMPartialModalViewController: UIViewController {
         }
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
     // MARK: - Public Methods
 
     func dismissViewController() {
@@ -135,7 +130,7 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
         toViewController?.viewWillAppear(transitionContext.isAnimated())
 
         // To present the view controller
-        if let viewController: EMPartialModalViewController = toViewController as? EMPartialModalViewController {
+        if let viewController = toViewController as? EMPartialModalViewController {
             if viewController.contentViewController == nil {
                 return;
             }
@@ -164,7 +159,7 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
             containerView.addSubview(viewController.view)
 
             UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: .None)
-            
+
             // Starting animation
             UIView.animateWithDuration(
                 animationDuration,
@@ -185,7 +180,7 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
         }
 
         // To dismiss the view controller
-        else if let viewController: EMPartialModalViewController = fromViewController as? EMPartialModalViewController {
+        else if let viewController = fromViewController as? EMPartialModalViewController {
             if viewController.contentViewController == nil {
                 return;
             }

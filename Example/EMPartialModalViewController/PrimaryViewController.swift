@@ -11,6 +11,8 @@ import UIKit
 class PrimaryViewController: UIViewController {
 
     @IBAction func dismiss() {
-        parentViewController?.dismissViewControllerAnimated(true, completion: nil)
+        parentViewController?.dismissViewControllerAnimated(true) {
+            println("dismissing view controller - done")
+        }
     }
 }

@@ -21,21 +21,25 @@ class ViewController: UIViewController {
     }
 
     @IBAction func showModalViewController_1() {
-        let content: UIViewController = storyboard!.instantiateViewControllerWithIdentifier("modalNav") as UIViewController
+        let content: UIViewController = storyboard!.instantiateViewControllerWithIdentifier("modalNav") as! UIViewController
         let partialModal: EMPartialModalViewController = EMPartialModalViewController(rootViewController: content, contentHeight: 400)
 
-        presentViewController(partialModal, animated: false, completion: nil)
+        presentViewController(partialModal, animated: true) {
+            println("presenting view controller - done")
+        }
     }
 
     @IBAction func showModalViewController_2() {
-        let content: UIViewController = storyboard!.instantiateViewControllerWithIdentifier("modalNav") as UIViewController
+        let content: UIViewController = storyboard!.instantiateViewControllerWithIdentifier("modalNav") as! UIViewController
         var frame: CGRect = content.view.frame
         frame.size.height = 200
         content.view.frame = frame
 
         let partialModal: EMPartialModalViewController = EMPartialModalViewController(rootViewController: content)
 
-        presentViewController(partialModal, animated: true, completion: nil)
+        presentViewController(partialModal, animated: true) {
+            println("presenting view controller - done")
+        }
     }
 }
 
