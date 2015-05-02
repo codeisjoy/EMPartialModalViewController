@@ -142,7 +142,7 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
             // The snapshot is going to be scaled down
             viewController.snapshotView = fromViewController.view.resizableSnapshotViewFromRect(
                 toViewController.view.frame,
-                afterScreenUpdates: true,
+                afterScreenUpdates: false,
                 withCapInsets: UIEdgeInsetsZero)
             let snapshot: UIView = viewController.snapshotView!
             viewController.view.insertSubview(snapshot, atIndex: 0)
