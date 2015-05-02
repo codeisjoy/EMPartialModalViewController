@@ -10,10 +10,6 @@ import UIKit
 
 class EMPartialModalViewController: UIViewController {
 
-    // MARK: - Constants
-
-    private let snapshotScale: CGFloat = 0.94
-
     // MARK: - Public Properties
 
     // The max height of content navigation view controller
@@ -35,7 +31,7 @@ class EMPartialModalViewController: UIViewController {
     private var contentViewHeight: CGFloat = 0
 
     // A snapshot of man screen with status bar
-    private var snapshotView: UIView = UIScreen.mainScreen().snapshotViewAfterScreenUpdates(false)
+    private var snapshotView: UIView?// = UIScreen.mainScreen().snapshotViewAfterScreenUpdates(false)
 
     // An overlay view, as button to dismiss the modal view controller on being touched
     private let overlayView: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
@@ -96,6 +92,10 @@ class EMPartialModalViewController: UIViewController {
         }
     }
 
+    override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return UIStatusBarStyle.LightContent
+    }
+
     // MARK: - Public Methods
 
     func dismissViewController() {
@@ -121,13 +121,13 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
     }
 
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
-        let fromViewController: UIViewController? = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey)
-        let toViewController: UIViewController? = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey)
+        let fromViewController: UIViewController = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey)!
+        let toViewController: UIViewController = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey)!
         let animationDuration: NSTimeInterval = transitionDuration(transitionContext)
         let containerView: UIView = transitionContext.containerView()
 
-        fromViewController?.viewWillDisappear(transitionContext.isAnimated())
-        toViewController?.viewWillAppear(transitionContext.isAnimated())
+        fromViewController.viewWillDisappear(transitionContext.isAnimated())
+        toViewController.viewWillAppear(transitionContext.isAnimated())
 
         // To present the view controller
         if let viewController = toViewController as? EMPartialModalViewController {
@@ -140,16 +140,17 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
 
             // Inserting the snapshot of the window root view controller at the back all views of modal view controller
             // The snapshot is going to be scaled down
-            let snapshot: UIView = viewController.snapshotView
+            viewController.snapshotView = fromViewController.view.resizableSnapshotViewFromRect(
+                toViewController.view.frame,
+                afterScreenUpdates: true,
+                withCapInsets: UIEdgeInsetsZero)
+            let snapshot: UIView = viewController.snapshotView!
             viewController.view.insertSubview(snapshot, atIndex: 0)
 
-            // Frame for snapshot to scale it down according to scales
-            // This way the scale anchore would be top middle.
-            var frame: CGRect = snapshot.superview!.bounds
-            frame.origin.x += snapshot.superview!.bounds.width * (1 - snapshotScale) / 2
-            frame.origin.y = frame.origin.x
-            frame.size.width *= snapshotScale
-            frame.size.height *= snapshotScale
+            // Frame for snapshot to scale it down
+            var frame: CGRect = snapshot.frame
+            let snapshotScale = UIApplication.sharedApplication().statusBarFrame.height / frame.height
+            frame = CGRectInset(frame, frame.width * snapshotScale, frame.height * snapshotScale)
 
             // Putting the modal view content at the bottom of the view
             let view = viewController.contentViewController!.view
@@ -157,8 +158,6 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
 
             // Adding the modal view controller into view
             containerView.addSubview(viewController.view)
-
-            UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: .None)
 
             // Starting animation
             UIView.animateWithDuration(
@@ -175,7 +174,7 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
                 completion: { (Bool) -> Void in
                     transitionContext.completeTransition(true)
                     viewController.viewDidAppear(transitionContext.isAnimated())
-                    fromViewController?.viewDidDisappear(transitionContext.isAnimated())
+                    fromViewController.viewDidDisappear(transitionContext.isAnimated())
                 })
         }
 
@@ -198,13 +197,12 @@ extension EMPartialModalViewController: UIViewControllerAnimatedTransitioning {
                 animations: { () -> Void in
                     viewController.overlayView.alpha = 0;
                     view.transform = CGAffineTransformMakeTranslation(0, view.bounds.height)
-                    viewController.snapshotView.frame = viewController.snapshotView.superview!.bounds
+                    viewController.snapshotView?.frame = viewController.view.bounds
                 },
                 completion: { (Bool) -> Void in
-                    UIApplication.sharedApplication().setStatusBarHidden(false, withAnimation: .None)
                     transitionContext.completeTransition(true)
-                    viewController.viewDidAppear(transitionContext.isAnimated())
-                    fromViewController?.viewDidDisappear(transitionContext.isAnimated())
+                    toViewController.viewDidAppear(transitionContext.isAnimated())
+                    fromViewController.viewDidDisappear(transitionContext.isAnimated())
             })
         }
     }
